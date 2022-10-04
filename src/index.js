@@ -9,7 +9,7 @@ const PORT = '3000';
 
 const fs = require('fs').promises;
 
-const talker = './talker.json';
+const talker = 'src/talker.json';
 
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
@@ -22,6 +22,7 @@ app.listen(PORT, () => {
 
 app.get('/talker', async (req, res) => {
   const data = JSON.parse(await fs.readFile(talker, 'utf-8'));
+  console.log(data);
   return res.status(200).json(data);
 });
 
