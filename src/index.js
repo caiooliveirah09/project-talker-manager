@@ -22,11 +22,14 @@ app.listen(PORT, () => {
 
 app.get('/talker', async (req, res) => {
   const data = JSON.parse(await fs.readFile(talker, 'utf-8'));
-  console.log(data);
   return res.status(200).json(data);
 });
 
 app.get('/talker/:id', async (req, res) => {
   const data = JSON.parse(await fs.readFile(talker, 'utf-8'));
-  return res.status(200).json(data);
+  const { id } = req.params;
+  const newData = data.find((people) => people.id === Number(id));
+  console.log(newData);
+  if (!newData) return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+  return res.status(200).json(newData);
 });
