@@ -25,9 +25,12 @@ app.listen(PORT, () => {
 });
 
 // 01
+
+const { readFile } = require('./utils/fs');
+
 app.get('/talker', async (req, res) => {
-  const data = JSON.parse(await fs.readFile(talker, 'utf-8'));
-  return res.status(200).json(data);
+  const data = await readFile();
+  return res.status(HTTP_OK_STATUS).json(data);
 });
 
 // 02
@@ -35,30 +38,33 @@ app.get('/talker/:id', async (req, res) => {
   const data = JSON.parse(await fs.readFile(talker, 'utf-8'));
   const { id } = req.params;
   const newData = data.find((people) => people.id === Number(id));
-  console.log(newData);
   if (!newData) return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
-  return res.status(200).json(newData);
+  return res.status(HTTP_OK_STATUS).json(newData);
 });
 
 // 03, 04
+const validateEmail = require('./middlewares/validateEmail');
+const validatePassword = require('./middlewares/validatePassword');
 
-function validateEmail(email) {
-  const regex = /\S+@\S+\.\S+/;
-  return regex.test(email);
-}
-
-app.post('/login', (req, res) => {
-  const { email, password } = req.body;
-  if (!email) return res.status(400).json({ message: 'O campo "email" é obrigatório' });
-  if (!validateEmail(email)) {
-    return res.status(400)
-  .json({ message: 'O "email" deve ter o formato "email@email.com"' });
-  }
-  if (!password) return res.status(400).json({ message: 'O campo "password" é obrigatório' });
-  if (password.length < 6) {
-    return res.status(400).json({ message: 'O "password" deve ter pelo menos 6 caracteres' });
-  }
+app.post('/login', validateEmail, validatePassword, (req, res) => {
   const token = Str.random(16);
-  console.log(token);
-  return res.status(200).json({ token });
+  return res.status(HTTP_OK_STATUS).json({ token });
+});
+
+// 05
+
+const validateToken = require('./middlewares/validateToken');
+const validateName = require('./middlewares/validateName');
+const validateAge = require('./middlewares/validateAge');
+const validateData = require('./middlewares/validateData');
+const validateRate = require('./middlewares/validateRate');
+const validateTalk = require('./middlewares/validateTalk');
+const { writeFile } = require('./utils/fs');
+
+app.post('/talker', validateToken, validateName,
+validateAge, validateTalk,
+validateData, validateRate, async (req, res) => {
+  const newPeople = req.body;
+  const newPeopleWithId = await writeFile(newPeople);
+  return res.status(201).json(newPeopleWithId);
 });
