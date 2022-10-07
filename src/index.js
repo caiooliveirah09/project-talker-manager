@@ -24,9 +24,26 @@ app.listen(PORT, () => {
   console.log('Online');
 });
 
-// 01
-
+const validateToken = require('./middlewares/validateToken');
+const validateName = require('./middlewares/validateName');
+const validateAge = require('./middlewares/validateAge');
+const validateData = require('./middlewares/validateData');
+const validateRate = require('./middlewares/validateRate');
+const validateTalk = require('./middlewares/validateTalk');
+const { writeFile } = require('./utils/fs');
 const { readFile } = require('./utils/fs');
+
+// 08
+
+app.get('/talker/search', validateToken, async (req, res) => {
+  const query = req.query.q;
+  const data = await readFile();
+  if (!query) return res.status(200).json(data);
+  const find = data.filter((d) => d.name.includes(query));
+  return res.status(200).json(find);
+});
+
+// 01
 
 app.get('/talker', async (req, res) => {
   const data = await readFile();
@@ -53,14 +70,6 @@ app.post('/login', validateEmail, validatePassword, (req, res) => {
 
 // 05
 
-const validateToken = require('./middlewares/validateToken');
-const validateName = require('./middlewares/validateName');
-const validateAge = require('./middlewares/validateAge');
-const validateData = require('./middlewares/validateData');
-const validateRate = require('./middlewares/validateRate');
-const validateTalk = require('./middlewares/validateTalk');
-const { writeFile } = require('./utils/fs');
-
 app.post('/talker', validateToken, validateName,
 validateAge, validateTalk,
 validateData, validateRate, async (req, res) => {
@@ -84,6 +93,8 @@ validateAge, validateTalk, validateData, validateRate, async (req, res) => {
   await fs.writeFile(talker, JSON.stringify(data));
   return res.status(200).json(data[index]);
 });
+
+// 07
 
 app.delete('/talker/:id', validateToken, async (req, res) => {
   const { id } = req.params;
