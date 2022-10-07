@@ -68,3 +68,19 @@ validateData, validateRate, async (req, res) => {
   const newPeopleWithId = await writeFile(newPeople);
   return res.status(201).json(newPeopleWithId);
 });
+
+// 06
+
+app.put('/talker/:id', validateToken, validateName,
+validateAge, validateTalk, validateData, validateRate, async (req, res) => {
+  const { id } = req.params;
+  const people = req.body;
+  const newPeople = { id: Number(id), ...people };
+  const data = await readFile();
+  console.log(data);
+  const index = data.findIndex((p) => p.id === Number(id));
+  console.log(index);
+  data[index] = newPeople;
+  await fs.writeFile(talker, JSON.stringify(data));
+  return res.status(200).json(data[index]);
+});
