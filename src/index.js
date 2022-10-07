@@ -84,3 +84,11 @@ validateAge, validateTalk, validateData, validateRate, async (req, res) => {
   await fs.writeFile(talker, JSON.stringify(data));
   return res.status(200).json(data[index]);
 });
+
+app.delete('/talker/:id', validateToken, async (req, res) => {
+  const { id } = req.params;
+  const data = await readFile();
+  const newData = data.filter((i) => i.id !== Number(id));
+  await fs.writeFile(talker, JSON.stringify(newData));
+  return res.status(204).json(newData);
+});
